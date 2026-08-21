@@ -26,6 +26,9 @@ IndexedDB, installable to a phone home screen, and fully functional offline.
 - **History** — chronological session list with full per-set detail views.
 - **Progress charts** — weight/duration and reps over time per exercise, plus
   session/set counters, rendered as dependency-free SVG.
+- **Day planner** — a per-day view with an adjustable gym time and meal
+  logging (breakfast, lunch, dinner, snacks) with item names, calories,
+  per-meal subtotals and a daily total. Browse any past or future day.
 - **Custom exercises** — add, edit, remove, and reorder the exercises of any
   workout day; create your own exercises (weight×reps or timed) alongside the
   built-in catalog. Logged history is never modified by edits.

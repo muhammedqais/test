@@ -99,7 +99,7 @@ export default function Settings({ settings, onUpdateSettings, onDataChanged, on
       setRestoreText('')
       setStatus({
         kind: 'ok',
-        text: `Restored ${count} workout${count === 1 ? '' : 's'} plus your exercises and settings.`
+        text: `Restored ${count} workout${count === 1 ? '' : 's'} plus your day plans, exercises, and settings.`
       })
     } catch (err) {
       console.error(err)

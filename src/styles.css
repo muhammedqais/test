@@ -1163,3 +1163,176 @@ body {
   font-weight: 600;
   margin-top: 10px;
 }
+
+/* ---------- Day planner ---------- */
+
+.day-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.day-nav__arrow {
+  flex: none;
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 12px;
+  background: var(--bg-soft);
+  color: var(--text-on-dark);
+  font-size: 22px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.day-nav__date {
+  flex: 1;
+  text-align: center;
+}
+
+.day-nav__title {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-on-dark);
+  margin-top: 2px;
+}
+
+.meal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.meal-header__title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.meal-header__total {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.meal-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.meal-item__name {
+  flex: 1;
+  min-width: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.meal-item__kcal {
+  flex: none;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.meal-add {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.meal-add input {
+  background: var(--card-muted);
+  border: 1.5px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  min-width: 0;
+  transition: border-color 0.15s ease;
+}
+
+.meal-add input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: #fff;
+}
+
+.meal-add input[type='text'] {
+  flex: 2;
+}
+
+.meal-add input[type='number'] {
+  flex: 1;
+}
+
+.meal-add__btn {
+  flex: none;
+  width: 46px;
+  height: 46px;
+  align-self: center;
+  background: var(--primary) !important;
+  color: #fff !important;
+  font-size: 18px;
+}
+
+.meal-add__btn:disabled {
+  opacity: 0.4;
+}
+
+.day-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.day-total__label {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.day-total__value {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.day-total__value small {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+input[type='time'] {
+  width: 100%;
+  background: var(--card-muted);
+  border: 1.5px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+input[type='time']:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: #fff;
+}

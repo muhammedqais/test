@@ -5,6 +5,12 @@ const ICONS = {
       <path d="M5 9.5V21h14V9.5" />
     </svg>
   ),
+  day: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3.5" y="5" width="17" height="16" rx="2.5" />
+      <path d="M8 3v4M16 3v4M3.5 10h17M8.5 14.5h2M13.5 14.5h2M8.5 17.5h2" />
+    </svg>
+  ),
   workout: (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M7.5 7.5v9M16.5 7.5v9M4.5 9.5v5M19.5 9.5v5M7.5 12h9M2.5 12h2M19.5 12h2" />
@@ -26,6 +32,7 @@ const ICONS = {
 
 const TABS = [
   { id: 'home', label: 'Home' },
+  { id: 'day', label: 'Day' },
   { id: 'workout', label: 'Workout' },
   { id: 'history', label: 'History' },
   { id: 'progress', label: 'Progress' }

@@ -1,15 +1,17 @@
-// IndexedDB persistence layer. Three stores:
+// IndexedDB persistence layer. Four stores:
 //  - sessions: completed WorkoutSession records
 //  - active:   the single in-progress session draft (survives refresh/close)
 //  - meta:     settings and the user's exercise/workout customizations
+//  - days:     per-date day plans (gym time, meals with calories)
 
 // Kept from the original branding: renaming an IndexedDB database would
 // orphan every workout already logged by existing installs.
 const DB_NAME = 'femurfit-db'
-const DB_VERSION = 2
+const DB_VERSION = 3
 const SESSIONS = 'sessions'
 const ACTIVE = 'active'
 const META = 'meta'
+const DAYS = 'days'
 const ACTIVE_KEY = 'current'
 
 let dbPromise = null
@@ -37,6 +39,9 @@ function openDatabase() {
       }
       if (!db.objectStoreNames.contains(META)) {
         db.createObjectStore(META, { keyPath: 'key' })
+      }
+      if (!db.objectStoreNames.contains(DAYS)) {
+        db.createObjectStore(DAYS, { keyPath: 'date' })
       }
     }
     request.onsuccess = () => resolve(request.result)
@@ -147,6 +152,21 @@ export async function clearSampleSessions() {
   return samples.length
 }
 
+export async function getDayPlan(dateKey) {
+  const db = await openDatabase()
+  return tx(db, DAYS, 'readonly', (store) => store.get(dateKey))
+}
+
+export async function saveDayPlan(plan) {
+  const db = await openDatabase()
+  return tx(db, DAYS, 'readwrite', (store) => store.put(plan))
+}
+
+export async function getAllDayPlans() {
+  const db = await openDatabase()
+  return tx(db, DAYS, 'readonly', (store) => store.getAll())
+}
+
 export async function getMeta(key) {
   const db = await openDatabase()
   const record = await tx(db, META, 'readonly', (store) => store.get(key))
@@ -161,16 +181,18 @@ export async function saveMeta(key, value) {
 // ---------- Backup & restore ----------
 
 export async function exportAllData() {
-  const [sessions, catalog, settings] = await Promise.all([
+  const [sessions, catalog, settings, days] = await Promise.all([
     getAllSessions(),
     getMeta('catalog'),
-    getMeta('settings')
+    getMeta('settings'),
+    getAllDayPlans()
   ])
   return {
     app: 'myfitness',
-    version: 1,
+    version: 2,
     exportedAt: new Date().toISOString(),
     sessions,
+    days,
     catalog,
     settings
   }
@@ -188,6 +210,10 @@ export async function importBackupData(payload) {
     if (!session || typeof session.id !== 'string' || typeof session.date !== 'string') continue
     await saveSession(session)
     count++
+  }
+  for (const day of payload.days || []) {
+    if (!day || typeof day.date !== 'string') continue
+    await saveDayPlan(day)
   }
   if (payload.catalog) await saveMeta('catalog', payload.catalog)
   if (payload.settings) await saveMeta('settings', payload.settings)

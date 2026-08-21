@@ -19,6 +19,7 @@ import WorkoutHome from './pages/WorkoutHome.jsx'
 import ActiveWorkout from './pages/ActiveWorkout.jsx'
 import History from './pages/History.jsx'
 import Progress from './pages/Progress.jsx'
+import DayPlanner from './pages/DayPlanner.jsx'
 import Settings from './pages/Settings.jsx'
 import WorkoutEditor from './pages/WorkoutEditor.jsx'
 
@@ -264,6 +265,8 @@ export default function App() {
         onEditWorkout={(workoutId) => setOverlay({ type: 'editor', workoutId })}
       />
     )
+  } else if (tab === 'day') {
+    content = <DayPlanner today={today} sessions={sessions} />
   } else if (tab === 'history') {
     content = <History sessions={sessions} />
   } else {
