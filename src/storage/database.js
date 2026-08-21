@@ -2,6 +2,8 @@
 //  - sessions: completed WorkoutSession records
 //  - active:   the single in-progress session draft (survives refresh/close)
 
+// Kept from the original branding: renaming an IndexedDB database would
+// orphan every workout already logged by existing installs.
 const DB_NAME = 'femurfit-db'
 const DB_VERSION = 1
 const SESSIONS = 'sessions'

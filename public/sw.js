@@ -1,9 +1,9 @@
-/* FemurFit Tracker service worker.
+/* MYFITNESS service worker.
    App shell is precached on install; everything else same-origin is cached
    at runtime (stale-while-revalidate), so the app keeps working offline
    after the first visit. Workout data lives in IndexedDB, not here. */
 
-const CACHE_NAME = 'femurfit-v1';
+const CACHE_NAME = 'myfitness-v1';
 
 const CORE_ASSETS = [
   './',

@@ -1,9 +1,9 @@
 {
-  "name": "femurfit-tracker",
+  "name": "myfitness",
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "FemurFit Tracker — mobile-first fitness tracker PWA",
+  "description": "MYFITNESS — mobile-first fitness tracker PWA",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

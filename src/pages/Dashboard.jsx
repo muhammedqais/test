@@ -119,7 +119,7 @@ export default function Dashboard({ today, sessions, draft, onStartWorkout, onRe
       <header className="app-header">
         <div>
           <div className="app-header__brand">
-            Femur<span>Fit</span>
+            MY<span>FITNESS</span>
           </div>
           <div style={{ fontSize: 12, color: '#9aa3af', fontWeight: 600 }}>Tracker</div>
         </div>

@@ -1,4 +1,4 @@
-# FemurFit Tracker
+# MYFITNESS
 
 A mobile-first fitness tracker Progressive Web App for a fixed 4-day weekly
 training plan. Built with React + Vite, persisted entirely in the browser with
@@ -77,7 +77,7 @@ All data stays in the browser — there is no backend and no login.
 
 ## A note on safety
 
-FemurFit is a tracking and exercise-guide tool, not a medical application. It
+MYFITNESS is a tracking and exercise-guide tool, not a medical application. It
 never auto-increases weights and its cues favor controlled, comfortable ranges
 of motion. Stop if movement causes pain, and skip any exercise a qualified
 professional has restricted for you.

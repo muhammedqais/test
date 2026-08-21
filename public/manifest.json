@@ -1,6 +1,6 @@
 {
-  "name": "FemurFit Tracker",
-  "short_name": "FemurFit",
+  "name": "MYFITNESS",
+  "short_name": "MYFITNESS",
   "description": "Your personal weekly workout tracker. Works offline.",
   "start_url": "./",
   "scope": "./",
