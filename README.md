@@ -34,9 +34,11 @@ IndexedDB, installable to a phone home screen, and fully functional offline.
   built-in catalog. Logged history is never modified by edits.
 - **Backup & restore** — export everything as a compact copyable backup code
   or a JSON file, and restore it on any device. No account or server needed.
-- **Daily reminders** — optional notification each day with the scheduled
-  workout (background delivery via Periodic Background Sync on installed
-  Android/Chrome PWAs; foreground elsewhere — no push server involved).
+- **Daily reminders at a chosen time** — pick a reminder time and get one
+  notification a day with that day's scheduled workout. Fires exactly on
+  time while the app runs; installed Android/Chrome PWAs also get it with
+  the app closed via Periodic Background Sync (at or shortly after the
+  chosen time). No push server involved, so iOS is foreground-only.
 - **PWA** — `manifest.json`, icons, and a service worker (network-first
   navigations, stale-while-revalidate assets) make the app installable and
   offline-capable after the first visit. Safe-area aware for notched phones.

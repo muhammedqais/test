@@ -3,7 +3,7 @@
    at runtime (stale-while-revalidate), so the app keeps working offline
    after the first visit. Workout data lives in IndexedDB, not here. */
 
-const CACHE_NAME = 'myfitness-v2';
+const CACHE_NAME = 'myfitness-v3';
 
 const CORE_ASSETS = [
   './',
@@ -76,8 +76,10 @@ self.addEventListener('fetch', (event) => {
 
 /* ---------- Daily workout reminders ---------- */
 /* Fired by Periodic Background Sync where the platform supports it
-   (installed Chrome/Android PWAs). The schedule mirrors the app's
-   built-in week; day index follows Date.getDay(). */
+   (installed Chrome/Android PWAs). The sync may run several times a day;
+   this handler gates it to the user's chosen reminder time and shows at
+   most one notification per day. Settings and the once-per-day state are
+   shared with the app through the same IndexedDB meta store. */
 
 const DAY_MESSAGES = {
   0: 'Rest day — recover, meal prep, and get ready for next week.',
@@ -89,16 +91,83 @@ const DAY_MESSAGES = {
   6: 'Lower Body & Core B today. Time to train!'
 };
 
+function metaGet(key) {
+  return new Promise((resolve) => {
+    const request = indexedDB.open('femurfit-db');
+    request.onsuccess = () => {
+      const db = request.result;
+      if (!db.objectStoreNames.contains('meta')) {
+        db.close();
+        resolve(null);
+        return;
+      }
+      const get = db.transaction('meta', 'readonly').objectStore('meta').get(key);
+      get.onsuccess = () => {
+        resolve(get.result ? get.result.value : null);
+        db.close();
+      };
+      get.onerror = () => {
+        resolve(null);
+        db.close();
+      };
+    };
+    request.onerror = () => resolve(null);
+  });
+}
+
+function metaPut(key, value) {
+  return new Promise((resolve) => {
+    const request = indexedDB.open('femurfit-db');
+    request.onsuccess = () => {
+      const db = request.result;
+      if (!db.objectStoreNames.contains('meta')) {
+        db.close();
+        resolve();
+        return;
+      }
+      const put = db.transaction('meta', 'readwrite').objectStore('meta').put({ key, value });
+      put.onsuccess = put.onerror = () => {
+        resolve();
+        db.close();
+      };
+    };
+    request.onerror = () => resolve();
+  });
+}
+
+function todayKey(now) {
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  const d = String(now.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+async function maybeShowDailyReminder() {
+  const settings = await metaGet('settings');
+  if (!settings || !settings.reminders) return;
+
+  const now = new Date();
+  const [h, m] = String(settings.reminderTime || '08:00').split(':').map(Number);
+  const target = new Date(now);
+  target.setHours(h || 0, m || 0, 0, 0);
+  if (now < target) return; // not yet time today
+
+  const key = todayKey(now);
+  const state = await metaGet('reminderState');
+  if (state && state.lastShownDate === key) return; // already reminded today
+
+  await self.registration.showNotification('MYFITNESS', {
+    body: DAY_MESSAGES[now.getDay()],
+    icon: './icons/icon-192.png',
+    badge: './icons/icon-192.png',
+    tag: 'daily-workout'
+  });
+  await metaPut('reminderState', { lastShownDate: key });
+}
+
 self.addEventListener('periodicsync', (event) => {
   if (event.tag === 'daily-workout') {
-    event.waitUntil(
-      self.registration.showNotification('MYFITNESS', {
-        body: DAY_MESSAGES[new Date().getDay()],
-        icon: './icons/icon-192.png',
-        badge: './icons/icon-192.png',
-        tag: 'daily-workout'
-      })
-    );
+    event.waitUntil(maybeShowDailyReminder());
   }
 });
 

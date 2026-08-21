@@ -13,6 +13,7 @@ import {
   makeId
 } from './storage/database.js'
 import { toDateKey } from './utils/dates.js'
+import { maybeShowDueReminder } from './utils/reminders.js'
 import BottomNavigation from './components/BottomNavigation.jsx'
 import Dashboard from './pages/Dashboard.jsx'
 import WorkoutHome from './pages/WorkoutHome.jsx'
@@ -102,6 +103,16 @@ export default function App() {
     const all = await getAllSessions()
     setSessions(all)
   }, [])
+
+  // While the app runs, fire the daily reminder exactly at the chosen
+  // time (checked every minute; once-per-day state is shared with the
+  // service worker's background path).
+  useEffect(() => {
+    if (loading) return
+    maybeShowDueReminder(settings)
+    const interval = setInterval(() => maybeShowDueReminder(settings), 60_000)
+    return () => clearInterval(interval)
+  }, [settings, loading])
 
   // Theme: dark by default, light when chosen in Settings. The choice is
   // stamped on <html> for CSS and mirrored into the theme-color meta so

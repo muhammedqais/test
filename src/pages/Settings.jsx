@@ -4,7 +4,8 @@ import { encodeBackup, decodeBackup } from '../utils/backup.js'
 import {
   enableReminders,
   disableReminders,
-  notificationsSupported
+  notificationsSupported,
+  DEFAULT_REMINDER_TIME
 } from '../utils/reminders.js'
 import { SAFETY_NOTE } from '../data/workouts.js'
 
@@ -26,13 +27,18 @@ export default function Settings({ settings, onUpdateSettings, onDataChanged, on
     }
     const result = await enableReminders()
     if (result.ok) {
-      onUpdateSettings({ ...settings, reminders: true, reminderMode: result.mode })
+      onUpdateSettings({
+        ...settings,
+        reminders: true,
+        reminderMode: result.mode,
+        reminderTime: settings.reminderTime || DEFAULT_REMINDER_TIME
+      })
       setStatus({
         kind: 'ok',
         text:
           result.mode === 'background'
-            ? 'Reminders on — your phone will nudge you daily even when the app is closed.'
-            : 'Reminders on. On this device the browser cannot wake the app in the background, so notifications appear when the app is opened or running.'
+            ? 'Reminders on — your phone will nudge you daily at your chosen time, even when the app is closed.'
+            : 'Reminders on. On this device the browser cannot wake the app in the background, so the reminder fires at your chosen time while the app is open.'
       })
     } else {
       setStatus({
@@ -170,16 +176,29 @@ export default function Settings({ settings, onUpdateSettings, onDataChanged, on
             aria-label="Daily reminder"
           />
         </div>
+        {remindersOn && (
+          <div className="form-field" style={{ marginTop: 14, marginBottom: 0 }}>
+            <label htmlFor="reminder-time">Reminder time</label>
+            <input
+              id="reminder-time"
+              type="time"
+              value={settings.reminderTime || DEFAULT_REMINDER_TIME}
+              onChange={(e) =>
+                onUpdateSettings({ ...settings, reminderTime: e.target.value })
+              }
+            />
+          </div>
+        )}
         {!notificationsSupported() && (
           <p className="empty-note" style={{ marginTop: 10 }}>
             Notifications are not supported in this browser.
           </p>
         )}
         <p className="empty-note" style={{ marginTop: 10 }}>
-          Background reminders (app closed) work on Android/Chrome once the app is
-          installed to the home screen. iPhones don't allow web apps to schedule
-          background notifications without a server, so there they show when you open the
-          app.
+          While the app is open, the reminder fires exactly at this time. With the app
+          closed, Android/Chrome (installed to the home screen) delivers it at or shortly
+          after the chosen time. iPhones don't let web apps schedule background
+          notifications without a server, so there it shows when you next open the app.
         </p>
       </div>
 
