@@ -1,12 +1,58 @@
 /* ============ MYFITNESS design system ============ */
 
+/* Dark theme is the default; [data-theme='light'] switches the palette.
+   --text-on-dark / --text-dim-on-dark are the page-level text colors
+   (their names come from the original dark page design). */
 :root {
-  --bg: #14171c;
-  --bg-soft: #1c2027;
-  --card: #ffffff;
-  --card-muted: #f3f4f6;
+  --page-outside: #08090c;
+  --bg: #101318;
+  --bg-soft: #1a2028;
+  --card: #1b212b;
+  --card-muted: #262e39;
+  --card-focus: #0f141b;
   --text-on-dark: #f5f6f8;
   --text-dim-on-dark: #9aa3af;
+  --text: #eef1f5;
+  --text-muted: #98a2b0;
+  --primary: #3b82f6;
+  --primary-soft: rgba(59, 130, 246, 0.15);
+  --primary-dark: #2563eb;
+  --success: #22c55e;
+  --success-soft: rgba(34, 197, 94, 0.16);
+  --warning: #d97706;
+  --neutral: #6b7480;
+  --border: #2c3440;
+  --border-strong: #3a424e;
+  --track: #262b33;
+  --nav-bg: rgba(16, 19, 24, 0.97);
+  --nav-border: #262b33;
+  --switch-off: #3a4350;
+  --note-bg: rgba(59, 130, 246, 0.14);
+  --note-text: #93c5fd;
+  --safety-bg: rgba(217, 119, 6, 0.14);
+  --safety-text: #fbbf24;
+  --error-bg: rgba(220, 38, 38, 0.16);
+  --error-text: #fca5a5;
+  --success-note-bg: rgba(34, 197, 94, 0.16);
+  --success-note-text: #4ade80;
+  --danger: #f87171;
+  --frame-ring: #262b33;
+  --radius: 18px;
+  --radius-sm: 12px;
+  --shadow: 0 4px 16px rgba(0, 0, 0, 0.28);
+  --shadow-card: 0 2px 10px rgba(0, 0, 0, 0.22);
+  --nav-height: 64px;
+}
+
+:root[data-theme='light'] {
+  --page-outside: #e2e5ea;
+  --bg: #f2f4f7;
+  --bg-soft: #ffffff;
+  --card: #ffffff;
+  --card-muted: #f3f4f6;
+  --card-focus: #ffffff;
+  --text-on-dark: #16181d;
+  --text-dim-on-dark: #6b7280;
   --text: #16181d;
   --text-muted: #6b7280;
   --primary: #2563eb;
@@ -14,14 +60,25 @@
   --primary-dark: #1d4ed8;
   --success: #16a34a;
   --success-soft: #dcfce7;
-  --warning: #d97706;
   --neutral: #9ca3af;
   --border: #e5e7eb;
-  --radius: 18px;
-  --radius-sm: 12px;
-  --shadow: 0 4px 16px rgba(0, 0, 0, 0.28);
-  --shadow-card: 0 2px 10px rgba(0, 0, 0, 0.22);
-  --nav-height: 64px;
+  --border-strong: #cbd2dc;
+  --track: #dde3ea;
+  --nav-bg: rgba(255, 255, 255, 0.97);
+  --nav-border: #e5e7eb;
+  --switch-off: #d1d5db;
+  --note-bg: #dbeafe;
+  --note-text: #1e3a8a;
+  --safety-bg: #fef9c3;
+  --safety-text: #713f12;
+  --error-bg: #fee2e2;
+  --error-text: #991b1b;
+  --success-note-bg: #dcfce7;
+  --success-note-text: #14532d;
+  --danger: #dc2626;
+  --frame-ring: #d6dae1;
+  --shadow: 0 4px 16px rgba(15, 23, 42, 0.1);
+  --shadow-card: 0 2px 10px rgba(15, 23, 42, 0.07);
 }
 
 * {
@@ -39,7 +96,7 @@ body {
   font-family:
     -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', 'Helvetica Neue',
     Arial, sans-serif;
-  background: #0c0e12;
+  background: var(--page-outside);
   color: var(--text-on-dark);
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
@@ -63,7 +120,7 @@ body {
 
 @media (min-width: 560px) {
   .app-frame {
-    box-shadow: 0 0 0 1px #262b33, 0 24px 60px rgba(0, 0, 0, 0.55);
+    box-shadow: 0 0 0 1px var(--frame-ring), 0 24px 60px rgba(0, 0, 0, 0.35);
     border-radius: 0;
   }
 }
@@ -195,7 +252,7 @@ body {
 
 .btn--danger-ghost {
   background: transparent;
-  color: #dc2626;
+  color: var(--danger);
   min-height: 46px;
 }
 
@@ -249,7 +306,7 @@ body {
 
 .today-card {
   background: linear-gradient(150deg, #1f2937 0%, #171c24 100%);
-  color: var(--text-on-dark);
+  color: #f5f6f8;
   border: 1px solid #2a313c;
   border-radius: var(--radius);
   padding: 20px;
@@ -364,12 +421,12 @@ body {
 }
 
 .week-row__status--upcoming {
-  border: 2px solid #3a424e;
+  border: 2px solid var(--border-strong);
   color: transparent;
 }
 
 .week-row__status--rest {
-  color: #4b5563;
+  color: var(--neutral);
 }
 
 /* ---------- Bottom navigation ---------- */
@@ -381,9 +438,9 @@ body {
   transform: translateX(-50%);
   width: 100%;
   max-width: 480px;
-  background: rgba(18, 21, 26, 0.97);
+  background: var(--nav-bg);
   backdrop-filter: blur(12px);
-  border-top: 1px solid #262b33;
+  border-top: 1px solid var(--nav-border);
   display: flex;
   padding-bottom: env(safe-area-inset-bottom, 0px);
   z-index: 50;
@@ -400,7 +457,7 @@ body {
   background: none;
   border: none;
   cursor: pointer;
-  color: #6b7480;
+  color: var(--text-dim-on-dark);
   font-family: inherit;
   font-size: 11px;
   font-weight: 600;
@@ -434,7 +491,7 @@ body {
 .progress-track {
   height: 8px;
   border-radius: 999px;
-  background: #262b33;
+  background: var(--track);
   overflow: hidden;
 }
 
@@ -516,17 +573,17 @@ body {
 
 .note-box {
   margin-top: 12px;
-  background: var(--primary-soft);
+  background: var(--note-bg);
   border-radius: var(--radius-sm);
   padding: 12px 14px;
   font-size: 13.5px;
   line-height: 1.5;
-  color: #1e3a8a;
+  color: var(--note-text);
 }
 
 .note-box--safety {
-  background: #fef9c3;
-  color: #713f12;
+  background: var(--safety-bg);
+  color: var(--safety-text);
 }
 
 /* ---------- Previous performance ---------- */
@@ -660,7 +717,7 @@ body {
 
 .field__control:focus-within {
   border-color: var(--primary);
-  background: #fff;
+  background: var(--card-focus);
 }
 
 .field__control input {
@@ -866,7 +923,7 @@ body {
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  border: 3px solid #2a313c;
+  border: 3px solid var(--track);
   border-top-color: var(--primary);
   animation: spin 0.8s linear infinite;
 }
@@ -878,8 +935,8 @@ body {
 }
 
 .error-box {
-  background: #fee2e2;
-  color: #991b1b;
+  background: var(--error-bg);
+  color: var(--error-text);
   border-radius: var(--radius-sm);
   padding: 14px 16px;
   font-size: 14px;
@@ -1009,7 +1066,7 @@ body {
   flex: none;
   border: none;
   border-radius: 999px;
-  background: #d1d5db;
+  background: var(--switch-off);
   cursor: pointer;
   transition: background 0.2s ease;
   padding: 0;
@@ -1071,7 +1128,7 @@ body {
 .form-field textarea:focus {
   outline: none;
   border-color: var(--primary);
-  background: #fff;
+  background: var(--card-focus);
 }
 
 .form-field textarea {
@@ -1136,7 +1193,7 @@ body {
 }
 
 .mini-btn--danger {
-  color: #dc2626;
+  color: var(--danger);
 }
 
 .code-box {
@@ -1155,8 +1212,8 @@ body {
 }
 
 .success-note {
-  background: var(--success-soft);
-  color: #14532d;
+  background: var(--success-note-bg);
+  color: var(--success-note-text);
   border-radius: var(--radius-sm);
   padding: 11px 14px;
   font-size: 14px;
@@ -1267,7 +1324,7 @@ body {
 .meal-add input:focus {
   outline: none;
   border-color: var(--primary);
-  background: #fff;
+  background: var(--card-focus);
 }
 
 .meal-add input[type='text'] {
@@ -1334,5 +1391,5 @@ input[type='time'] {
 input[type='time']:focus {
   outline: none;
   border-color: var(--primary);
-  background: #fff;
+  background: var(--card-focus);
 }

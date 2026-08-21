@@ -54,7 +54,7 @@ export default function Progress({ sessions, catalog }) {
       <h1 className="page-title" style={{ marginBottom: 4 }}>
         Progress
       </h1>
-      <p style={{ fontSize: 13.5, color: '#9aa3af', marginBottom: 8 }}>
+      <p style={{ fontSize: 13.5, color: 'var(--text-dim-on-dark)', marginBottom: 8 }}>
         Pick an exercise to see how your training develops over time.
       </p>
 

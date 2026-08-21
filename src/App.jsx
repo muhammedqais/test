@@ -103,6 +103,16 @@ export default function App() {
     setSessions(all)
   }, [])
 
+  // Theme: dark by default, light when chosen in Settings. The choice is
+  // stamped on <html> for CSS and mirrored into the theme-color meta so
+  // the phone's status bar matches.
+  useEffect(() => {
+    const theme = settings.theme === 'light' ? 'light' : 'dark'
+    document.documentElement.dataset.theme = theme
+    const meta = document.querySelector('meta[name="theme-color"]')
+    if (meta) meta.setAttribute('content', theme === 'light' ? '#f2f4f7' : '#101318')
+  }, [settings.theme])
+
   useEffect(() => {
     let cancelled = false
     async function init() {

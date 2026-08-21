@@ -131,6 +131,30 @@ export default function Settings({ settings, onUpdateSettings, onDataChanged, on
       <div className="card">
         <div className="toggle-row">
           <div>
+            <div className="toggle-row__label">Light mode</div>
+            <p className="empty-note" style={{ marginTop: 2 }}>
+              The app is dark by default — flip this for a light look.
+            </p>
+          </div>
+          <button
+            type="button"
+            className={`switch ${settings?.theme === 'light' ? 'switch--on' : ''}`}
+            onClick={() =>
+              onUpdateSettings({
+                ...settings,
+                theme: settings?.theme === 'light' ? 'dark' : 'light'
+              })
+            }
+            role="switch"
+            aria-checked={settings?.theme === 'light'}
+            aria-label="Light mode"
+          />
+        </div>
+      </div>
+
+      <div className="card">
+        <div className="toggle-row">
+          <div>
             <div className="toggle-row__label">Daily reminder</div>
             <p className="empty-note" style={{ marginTop: 2 }}>
               A notification each day with what's on the schedule.

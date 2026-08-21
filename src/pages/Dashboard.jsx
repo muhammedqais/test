@@ -52,7 +52,7 @@ function TodayCard({ today, draft, onStartWorkout, onResume, onViewWeek }) {
         </button>
       )}
       {draft && !resumable && (
-        <p style={{ marginTop: 10, fontSize: 13, color: '#9aa3af', textAlign: 'center' }}>
+        <p style={{ marginTop: 10, fontSize: 13, color: 'var(--text-dim-on-dark)', textAlign: 'center' }}>
           A {getWorkout(draft.workoutId)?.name} session is still in progress — open the
           Workout tab to finish or discard it.
         </p>
@@ -141,7 +141,7 @@ export default function Dashboard({
           <div className="app-header__brand">
             MY<span>FITNESS</span>
           </div>
-          <div style={{ fontSize: 12, color: '#9aa3af', fontWeight: 600 }}>Tracker</div>
+          <div style={{ fontSize: 12, color: 'var(--text-dim-on-dark)', fontWeight: 600 }}>Tracker</div>
         </div>
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 4 }}>
           <div className="app-header__meta">
