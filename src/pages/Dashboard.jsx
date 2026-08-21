@@ -61,13 +61,13 @@ function TodayCard({ today, draft, onStartWorkout, onResume, onViewWeek }) {
   )
 }
 
-function WeekSchedule({ today, sessions, weekListRef }) {
+function WeekSchedule({ today, sessions, weekListRef, onEditWorkout }) {
   const weekStart = getWeekStart(today)
   const todayIdx = today.getDay()
 
   const completedThisWeek = new Set(
     sessions
-      .filter((s) => s.completed && !s.sample && isDateKeyInWeek(s.date, weekStart))
+      .filter((s) => s.completed && isDateKeyInWeek(s.date, weekStart))
       .map((s) => s.workoutId)
   )
 
@@ -93,15 +93,27 @@ function WeekSchedule({ today, sessions, weekListRef }) {
           status = <span className="week-row__status week-row__status--upcoming">○</span>
         }
 
+        const rowClass = `week-row ${isToday ? 'week-row--today' : ''} ${!isWorkout ? 'week-row--rest' : ''}`
+        if (isWorkout) {
+          return (
+            <button
+              key={entry.day}
+              type="button"
+              className={rowClass}
+              style={{ font: 'inherit', textAlign: 'left', cursor: 'pointer', width: '100%' }}
+              onClick={() => onEditWorkout(entry.workoutId)}
+              aria-label={`Customize ${workout.name}`}
+            >
+              <span className="week-row__day">{entry.label}</span>
+              <span className="week-row__name">{workout.shortName}</span>
+              {status}
+            </button>
+          )
+        }
         return (
-          <div
-            key={entry.day}
-            className={`week-row ${isToday ? 'week-row--today' : ''} ${!isWorkout ? 'week-row--rest' : ''}`}
-          >
+          <div key={entry.day} className={rowClass}>
             <span className="week-row__day">{entry.label}</span>
-            <span className="week-row__name">
-              {isWorkout ? workout.shortName : entry.title}
-            </span>
+            <span className="week-row__name">{entry.title}</span>
             {status}
           </div>
         )
@@ -110,7 +122,15 @@ function WeekSchedule({ today, sessions, weekListRef }) {
   )
 }
 
-export default function Dashboard({ today, sessions, draft, onStartWorkout, onResume }) {
+export default function Dashboard({
+  today,
+  sessions,
+  draft,
+  onStartWorkout,
+  onResume,
+  onOpenSettings,
+  onEditWorkout
+}) {
   const weekListRef = useRef(null)
   const entry = getScheduleForDay(today.getDay())
 
@@ -123,9 +143,17 @@ export default function Dashboard({ today, sessions, draft, onStartWorkout, onRe
           </div>
           <div style={{ fontSize: 12, color: '#9aa3af', fontWeight: 600 }}>Tracker</div>
         </div>
-        <div className="app-header__meta">
-          <strong>{formatLongDate(today)}</strong>
-          Week {getWeekNumber(today)}
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 4 }}>
+          <div className="app-header__meta">
+            <strong>{formatLongDate(today)}</strong>
+            Week {getWeekNumber(today)}
+          </div>
+          <button type="button" className="icon-button" onClick={onOpenSettings} aria-label="Settings">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="3" />
+              <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.56V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1.11-1.56 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.56-1.03H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.56-1.11 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34h.01A1.7 1.7 0 0 0 10 3.09V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1.03 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v.01A1.7 1.7 0 0 0 20.91 10H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.51 1z" />
+            </svg>
+          </button>
         </div>
       </header>
 
@@ -151,7 +179,15 @@ export default function Dashboard({ today, sessions, draft, onStartWorkout, onRe
       )}
 
       <h2 className="section-title">This week</h2>
-      <WeekSchedule today={today} sessions={sessions} weekListRef={weekListRef} />
+      <WeekSchedule
+        today={today}
+        sessions={sessions}
+        weekListRef={weekListRef}
+        onEditWorkout={onEditWorkout}
+      />
+      <p className="center-note" style={{ padding: '12px 8px 0' }}>
+        Tap a training day to customize its exercises.
+      </p>
     </div>
   )
 }

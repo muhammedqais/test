@@ -58,10 +58,7 @@ export default function ProgressChart({ points, unit, color = '#2563eb', emptyLa
         )}
         <path d={path} fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
         {valid.map((p, i) => (
-          <g key={i}>
-            <circle cx={x(i)} cy={y(p.value)} r="4.5" fill="#fff" stroke={color} strokeWidth="2.5" />
-            {p.sample && <circle cx={x(i)} cy={y(p.value)} r="1.8" fill="#d97706" />}
-          </g>
+          <circle key={i} cx={x(i)} cy={y(p.value)} r="4.5" fill="#fff" stroke={color} strokeWidth="2.5" />
         ))}
         {valid.map((p, i) =>
           i % labelEvery === 0 || i === valid.length - 1 ? (

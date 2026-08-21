@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { getWorkout, getExercise } from './data/workouts.js'
+import { getWorkout, getExercise, applyCatalog } from './data/workouts.js'
 import {
   isStorageSupported,
   getAllSessions,
@@ -8,9 +8,10 @@ import {
   clearActiveSession,
   saveSession,
   clearSampleSessions,
+  getMeta,
+  saveMeta,
   makeId
 } from './storage/database.js'
-import { buildSampleSessions } from './data/sampleData.js'
 import { toDateKey } from './utils/dates.js'
 import BottomNavigation from './components/BottomNavigation.jsx'
 import Dashboard from './pages/Dashboard.jsx'
@@ -18,6 +19,8 @@ import WorkoutHome from './pages/WorkoutHome.jsx'
 import ActiveWorkout from './pages/ActiveWorkout.jsx'
 import History from './pages/History.jsx'
 import Progress from './pages/Progress.jsx'
+import Settings from './pages/Settings.jsx'
+import WorkoutEditor from './pages/WorkoutEditor.jsx'
 
 function buildDraft(workoutId, today) {
   const workout = getWorkout(workoutId)
@@ -67,22 +70,29 @@ function draftToSession(draft) {
 
 export default function App() {
   const [tab, setTab] = useState('home')
+  const [overlay, setOverlay] = useState(null) // null | {type:'settings'} | {type:'editor', workoutId}
   const [loading, setLoading] = useState(true)
   const [storageError, setStorageError] = useState(null)
   const [sessions, setSessions] = useState([])
   const [draft, setDraft] = useState(null)
-  const [busy, setBusy] = useState(false)
+  const [catalog, setCatalog] = useState(null)
+  const [settings, setSettings] = useState({})
   const [today, setToday] = useState(() => new Date())
   const persistTimer = useRef(null)
 
-  // Keep "today" fresh if the app stays open across midnight or is
-  // brought back from the background.
+  // The date always comes from the device clock. Refresh it on a timer and
+  // the moment the app regains focus or comes back from the background, so
+  // the schedule flips at midnight without reopening the app.
   useEffect(() => {
     const refresh = () => setToday(new Date())
-    const interval = setInterval(refresh, 60_000)
+    const interval = setInterval(refresh, 30_000)
+    window.addEventListener('focus', refresh)
+    window.addEventListener('pageshow', refresh)
     document.addEventListener('visibilitychange', refresh)
     return () => {
       clearInterval(interval)
+      window.removeEventListener('focus', refresh)
+      window.removeEventListener('pageshow', refresh)
       document.removeEventListener('visibilitychange', refresh)
     }
   }, [])
@@ -103,8 +113,17 @@ export default function App() {
         return
       }
       try {
-        const [all, activeDraft] = await Promise.all([getAllSessions(), getActiveSession()])
+        await clearSampleSessions()
+        const [all, activeDraft, storedCatalog, storedSettings] = await Promise.all([
+          getAllSessions(),
+          getActiveSession(),
+          getMeta('catalog'),
+          getMeta('settings')
+        ])
         if (cancelled) return
+        applyCatalog(storedCatalog)
+        setCatalog(storedCatalog)
+        setSettings(storedSettings || {})
         setSessions(all)
         if (activeDraft) setDraft(activeDraft)
       } catch (err) {
@@ -134,11 +153,23 @@ export default function App() {
     }, 250)
   }, [])
 
+  const updateCatalog = useCallback((next) => {
+    applyCatalog(next)
+    setCatalog(next)
+    saveMeta('catalog', next).catch((err) => console.error('Failed to save catalog', err))
+  }, [])
+
+  const updateSettings = useCallback((next) => {
+    setSettings(next)
+    saveMeta('settings', next).catch((err) => console.error('Failed to save settings', err))
+  }, [])
+
   const startWorkout = useCallback(
     (workoutId) => {
       const fresh = buildDraft(workoutId, today)
       setDraft(fresh)
       saveActiveSession(fresh).catch((err) => console.error('Failed to persist draft', err))
+      setOverlay(null)
       setTab('workout')
       window.scrollTo({ top: 0 })
     },
@@ -163,30 +194,16 @@ export default function App() {
     [reloadSessions]
   )
 
-  const loadSamples = useCallback(async () => {
-    setBusy(true)
-    try {
-      for (const session of buildSampleSessions(today)) {
-        await saveSession(session)
-      }
-      await reloadSessions()
-    } catch (err) {
-      console.error(err)
-    } finally {
-      setBusy(false)
-    }
-  }, [reloadSessions, today])
-
-  const clearSamples = useCallback(async () => {
-    setBusy(true)
-    try {
-      await clearSampleSessions()
-      await reloadSessions()
-    } catch (err) {
-      console.error(err)
-    } finally {
-      setBusy(false)
-    }
+  // After a restore, re-read everything the backup may have changed.
+  const handleDataChanged = useCallback(async () => {
+    const [storedCatalog, storedSettings] = await Promise.all([
+      getMeta('catalog'),
+      getMeta('settings')
+    ])
+    applyCatalog(storedCatalog)
+    setCatalog(storedCatalog)
+    setSettings(storedSettings || {})
+    await reloadSessions()
   }, [reloadSessions])
 
   let content
@@ -196,6 +213,24 @@ export default function App() {
         <div className="spinner" />
         Loading your training data…
       </div>
+    )
+  } else if (overlay?.type === 'settings') {
+    content = (
+      <Settings
+        settings={settings}
+        onUpdateSettings={updateSettings}
+        onDataChanged={handleDataChanged}
+        onBack={() => setOverlay(null)}
+      />
+    )
+  } else if (overlay?.type === 'editor') {
+    content = (
+      <WorkoutEditor
+        workoutId={overlay.workoutId}
+        catalog={catalog}
+        onUpdateCatalog={updateCatalog}
+        onBack={() => setOverlay(null)}
+      />
     )
   } else if (tab === 'home') {
     content = (
@@ -207,6 +242,8 @@ export default function App() {
           draft={draft}
           onStartWorkout={startWorkout}
           onResume={() => setTab('workout')}
+          onOpenSettings={() => setOverlay({ type: 'settings' })}
+          onEditWorkout={(workoutId) => setOverlay({ type: 'editor', workoutId })}
         />
       </>
     )
@@ -221,27 +258,25 @@ export default function App() {
         onExit={() => setTab('home')}
       />
     ) : (
-      <WorkoutHome today={today} onStartWorkout={startWorkout} />
-    )
-  } else if (tab === 'history') {
-    content = (
-      <History
-        sessions={sessions}
-        onLoadSamples={loadSamples}
-        onClearSamples={clearSamples}
-        busy={busy}
+      <WorkoutHome
+        today={today}
+        onStartWorkout={startWorkout}
+        onEditWorkout={(workoutId) => setOverlay({ type: 'editor', workoutId })}
       />
     )
+  } else if (tab === 'history') {
+    content = <History sessions={sessions} />
   } else {
-    content = <Progress sessions={sessions} />
+    content = <Progress sessions={sessions} catalog={catalog} />
   }
 
   return (
     <div className="app-frame">
       <main className="app-content">{content}</main>
       <BottomNavigation
-        activeTab={tab}
+        activeTab={overlay ? null : tab}
         onNavigate={(next) => {
+          setOverlay(null)
           setTab(next)
           window.scrollTo({ top: 0 })
         }}

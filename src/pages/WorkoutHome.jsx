@@ -5,7 +5,7 @@ import ExerciseDetails from './ExerciseDetails.jsx'
 
 // The Workout tab when no session is running: today's plan on training
 // days, a recovery card on rest days.
-export default function WorkoutHome({ today, onStartWorkout }) {
+export default function WorkoutHome({ today, onStartWorkout, onEditWorkout }) {
   const [detailId, setDetailId] = useState(null)
   const entry = getScheduleForDay(today.getDay())
 
@@ -71,6 +71,14 @@ export default function WorkoutHome({ today, onStartWorkout }) {
         onClick={() => onStartWorkout(entry.workoutId)}
       >
         Start workout
+      </button>
+      <button
+        type="button"
+        className="btn btn--ghost-dark"
+        style={{ marginTop: 6 }}
+        onClick={() => onEditWorkout(entry.workoutId)}
+      >
+        Customize this workout
       </button>
     </div>
   )

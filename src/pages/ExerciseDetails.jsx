@@ -57,15 +57,7 @@ export default function ExerciseDetails({ exerciseId, onBack }) {
             .slice(0, 5)
             .map((point) => (
               <div className="detail-exercise" key={point.date}>
-                <h3>
-                  {formatShortDate(point.date)}
-                  {point.sample && (
-                    <>
-                      {' '}
-                      <span className="chip chip--sample">Sample</span>
-                    </>
-                  )}
-                </h3>
+                <h3>{formatShortDate(point.date)}</h3>
                 <div className="prev-table">
                   {point.sets.map((s) => (
                     <div className="prev-row" key={s.setNumber}>

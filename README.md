@@ -26,11 +26,17 @@ IndexedDB, installable to a phone home screen, and fully functional offline.
 - **History** — chronological session list with full per-set detail views.
 - **Progress charts** — weight/duration and reps over time per exercise, plus
   session/set counters, rendered as dependency-free SVG.
-- **Sample data** — optional demo sessions for previewing History/Progress,
-  always flagged with a "Sample" badge and removable in one tap.
+- **Custom exercises** — add, edit, remove, and reorder the exercises of any
+  workout day; create your own exercises (weight×reps or timed) alongside the
+  built-in catalog. Logged history is never modified by edits.
+- **Backup & restore** — export everything as a compact copyable backup code
+  or a JSON file, and restore it on any device. No account or server needed.
+- **Daily reminders** — optional notification each day with the scheduled
+  workout (background delivery via Periodic Background Sync on installed
+  Android/Chrome PWAs; foreground elsewhere — no push server involved).
 - **PWA** — `manifest.json`, icons, and a service worker (network-first
   navigations, stale-while-revalidate assets) make the app installable and
-  offline-capable after the first visit.
+  offline-capable after the first visit. Safe-area aware for notched phones.
 
 ## Development
 
@@ -49,12 +55,14 @@ The service worker only registers in production builds — use
 
 ```
 src/
-├── components/     # BottomNavigation, ExerciseCard, SetLogger, WorkoutProgress,
-│                   # ExerciseGuide (SVG illustrations), ProgressChart, PreviousPerformance
-├── pages/          # Dashboard, WorkoutHome, ActiveWorkout, History, Progress, ExerciseDetails
-├── data/           # workouts.js (exercise database + weekly schedule), sampleData.js
-├── storage/        # database.js (IndexedDB layer)
-├── utils/          # dates.js
+├── components/     # BottomNavigation, ExerciseCard, ExerciseForm, SetLogger,
+│                   # WorkoutProgress, ExerciseGuide (SVG illustrations),
+│                   # ProgressChart, PreviousPerformance
+├── pages/          # Dashboard, WorkoutHome, ActiveWorkout, History, Progress,
+│                   # ExerciseDetails, WorkoutEditor, Settings
+├── data/           # workouts.js (exercise database + weekly schedule + live catalog)
+├── storage/        # database.js (IndexedDB layer, backup/restore)
+├── utils/          # dates.js, backup.js, reminders.js
 ├── App.jsx
 └── main.jsx
 public/

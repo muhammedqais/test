@@ -70,7 +70,10 @@ body {
 
 .app-content {
   flex: 1;
-  padding: 20px 16px calc(var(--nav-height) + 28px + env(safe-area-inset-bottom, 0px));
+  /* Top padding clears the phone's status bar / camera cutout when the
+     app runs standalone with the viewport extending under it. */
+  padding: calc(18px + env(safe-area-inset-top, 0px)) 16px
+    calc(var(--nav-height) + 28px + env(safe-area-inset-bottom, 0px));
 }
 
 /* ---------- Typography ---------- */
@@ -965,4 +968,198 @@ body {
   font-weight: 600;
   color: var(--text-muted);
   white-space: nowrap;
+}
+
+/* ---------- Settings & editors ---------- */
+
+.icon-button {
+  background: none;
+  border: none;
+  color: var(--text-dim-on-dark);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-button svg {
+  width: 22px;
+  height: 22px;
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.toggle-row__label {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.switch {
+  position: relative;
+  width: 52px;
+  height: 30px;
+  flex: none;
+  border: none;
+  border-radius: 999px;
+  background: #d1d5db;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  padding: 0;
+}
+
+.switch::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease;
+}
+
+.switch--on {
+  background: var(--success);
+}
+
+.switch--on::after {
+  transform: translateX(22px);
+}
+
+.form-field {
+  margin-bottom: 14px;
+}
+
+.form-field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.form-field input[type='text'],
+.form-field input[type='number'],
+.form-field select,
+.form-field textarea {
+  width: 100%;
+  background: var(--card-muted);
+  border: 1.5px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 13px 14px;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  transition: border-color 0.15s ease;
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: #fff;
+}
+
+.form-field textarea {
+  min-height: 96px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.form-row {
+  display: flex;
+  gap: 10px;
+}
+
+.form-row .form-field {
+  flex: 1;
+}
+
+.editor-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.editor-row:last-child {
+  border-bottom: none;
+}
+
+.editor-row__name {
+  flex: 1;
+  min-width: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.editor-row__name small {
+  display: block;
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.editor-row .mini-btn {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 10px;
+  background: var(--card-muted);
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.editor-row .mini-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.mini-btn--danger {
+  color: #dc2626;
+}
+
+.code-box {
+  width: 100%;
+  background: var(--card-muted);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  color: var(--text);
+  word-break: break-all;
+  max-height: 130px;
+  overflow-y: auto;
+  line-height: 1.5;
+}
+
+.success-note {
+  background: var(--success-soft);
+  color: #14532d;
+  border-radius: var(--radius-sm);
+  padding: 11px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: 10px;
 }

@@ -12,12 +12,6 @@ function SessionDetail({ session, onBack }) {
       <div className="eyebrow">{formatShortDate(session.date)}</div>
       <h1 className="page-title" style={{ margin: '4px 0 14px' }}>
         {workout ? workout.name : session.workoutId}
-        {session.sample && (
-          <>
-            {' '}
-            <span className="chip chip--sample">Sample</span>
-          </>
-        )}
       </h1>
       <div className="card">
         {session.exercises.map((log) => {
@@ -58,10 +52,9 @@ function SessionDetail({ session, onBack }) {
   )
 }
 
-export default function History({ sessions, onLoadSamples, onClearSamples, busy }) {
+export default function History({ sessions }) {
   const [selectedId, setSelectedId] = useState(null)
   const selected = sessions.find((s) => s.id === selectedId)
-  const hasSamples = sessions.some((s) => s.sample)
 
   if (selected) {
     return <SessionDetail session={selected} onBack={() => setSelectedId(null)} />
@@ -77,13 +70,10 @@ export default function History({ sessions, onLoadSamples, onClearSamples, busy 
         <div className="card" style={{ textAlign: 'center' }}>
           <div className="rest-icon">📓</div>
           <div className="eyebrow">No workouts yet</div>
-          <p className="empty-note" style={{ margin: '10px 0 16px' }}>
-            Completed workouts will appear here. Finish your first session, or load
-            clearly-marked sample data to preview this screen.
+          <p className="empty-note" style={{ margin: '10px 0 4px' }}>
+            Completed workouts will appear here after you finish and save your first
+            session.
           </p>
-          <button type="button" className="btn btn--secondary" onClick={onLoadSamples} disabled={busy}>
-            {busy ? 'Loading…' : 'Load sample data'}
-          </button>
         </div>
       ) : (
         <>
@@ -102,15 +92,7 @@ export default function History({ sessions, onLoadSamples, onClearSamples, busy 
               >
                 <div className="history-item__row">
                   <div>
-                    <div className="eyebrow">
-                      {formatShortDate(session.date)}
-                      {session.sample && (
-                        <>
-                          {' '}
-                          <span className="chip chip--sample">Sample</span>
-                        </>
-                      )}
-                    </div>
+                    <div className="eyebrow">{formatShortDate(session.date)}</div>
                     <div className="history-item__title">
                       {workout ? workout.name : session.workoutId}
                     </div>
@@ -125,16 +107,6 @@ export default function History({ sessions, onLoadSamples, onClearSamples, busy 
               </button>
             )
           })}
-          {hasSamples && (
-            <button
-              type="button"
-              className="btn btn--danger-ghost"
-              onClick={onClearSamples}
-              disabled={busy}
-            >
-              Remove sample data
-            </button>
-          )}
         </>
       )}
     </div>

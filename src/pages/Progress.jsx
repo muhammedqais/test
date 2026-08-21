@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
-import { EXERCISES, getExercise } from '../data/workouts.js'
+import { listExercises, getExercise } from '../data/workouts.js'
 import { getExerciseHistory } from '../storage/database.js'
 import ProgressChart from '../components/ProgressChart.jsx'
 import ExerciseDetails from './ExerciseDetails.jsx'
 
-const SELECTABLE = Object.values(EXERCISES)
-
-export default function Progress({ sessions }) {
-  const [exerciseId, setExerciseId] = useState(SELECTABLE[0].id)
+export default function Progress({ sessions, catalog }) {
+  // Recomputed on every render so newly created/edited exercises show up.
+  const selectable = listExercises()
+  const [exerciseId, setExerciseId] = useState(selectable[0].id)
   const [history, setHistory] = useState(null)
   const [showDetails, setShowDetails] = useState(false)
 
@@ -49,8 +49,6 @@ export default function Progress({ sessions }) {
     return <ExerciseDetails exerciseId={exerciseId} onBack={() => setShowDetails(false)} />
   }
 
-  const hasSample = (history || []).some((p) => p.sample)
-
   return (
     <div className="fade-in">
       <h1 className="page-title" style={{ marginBottom: 4 }}>
@@ -66,9 +64,10 @@ export default function Progress({ sessions }) {
           onChange={(e) => setExerciseId(e.target.value)}
           aria-label="Select exercise"
         >
-          {SELECTABLE.map((ex) => (
+          {selectable.map((ex) => (
             <option key={ex.id} value={ex.id}>
               {ex.name}
+              {ex.custom ? ' (custom)' : ''}
             </option>
           ))}
         </select>
@@ -83,8 +82,7 @@ export default function Progress({ sessions }) {
           <div className="rest-icon">📈</div>
           <div className="eyebrow">No data yet</div>
           <p className="empty-note" style={{ marginTop: 10 }}>
-            Log this exercise in a workout and your progress will show up here. You can
-            also load sample data from the History tab to preview the charts.
+            Log this exercise in a workout and your progress will show up here.
           </p>
         </div>
       ) : (
@@ -124,12 +122,6 @@ export default function Progress({ sessions }) {
                 <span>total sets</span>
               </div>
             </div>
-            {hasSample && (
-              <p className="empty-note" style={{ marginTop: 10 }}>
-                Points marked with an orange dot come from sample data, not your own
-                workouts.
-              </p>
-            )}
           </div>
           <button type="button" className="btn btn--ghost-dark" onClick={() => setShowDetails(true)}>
             View exercise details →

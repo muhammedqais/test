@@ -410,13 +410,69 @@ export function getScheduleForDay(dayIndex) {
   return WEEK_SCHEDULE.find((d) => d.day === dayIndex)
 }
 
+// ---------- Live catalog ----------
+// The user can edit built-in exercises, create their own, and change which
+// exercises each workout contains. Those customizations are stored in
+// IndexedDB and applied here at startup (and after every edit), so the rest
+// of the app keeps reading exercises/workouts synchronously.
+
+let liveExercises = { ...EXERCISES }
+let liveWorkoutLists = {}
+
+export function applyCatalog(catalog) {
+  const c = catalog || {}
+  liveExercises = { ...EXERCISES }
+  for (const [id, patch] of Object.entries(c.overrides || {})) {
+    if (liveExercises[id]) liveExercises[id] = { ...liveExercises[id], ...patch, id }
+  }
+  for (const [id, exercise] of Object.entries(c.customExercises || {})) {
+    liveExercises[id] = { ...exercise, id, custom: true }
+  }
+  liveWorkoutLists = c.workoutExercises || {}
+}
+
+export function isBuiltinExercise(id) {
+  return Object.prototype.hasOwnProperty.call(EXERCISES, id)
+}
+
+export function listExercises() {
+  return Object.values(liveExercises)
+}
+
 export function getExercise(id) {
-  return EXERCISES[id]
+  return (
+    liveExercises[id] || {
+      id,
+      name: 'Removed exercise',
+      category: 'Other',
+      type: 'strength',
+      targetSets: 3,
+      targetReps: '—',
+      instructions: [],
+      illustration: null,
+      missing: true
+    }
+  )
 }
 
 export function getWorkout(id) {
-  return WORKOUTS[id]
+  const base = WORKOUTS[id]
+  if (!base) return base
+  const custom = liveWorkoutLists[id]
+  if (!custom) return base
+  return { ...base, exercises: custom.filter((eid) => liveExercises[eid]) }
 }
+
+export function makeExerciseId(name) {
+  const slug = String(name)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 40)
+  return `custom-${slug || 'exercise'}-${Math.random().toString(36).slice(2, 6)}`
+}
+
+export const EXERCISE_CATEGORIES = ['Chest', 'Back', 'Shoulders', 'Arms', 'Legs', 'Core', 'Other']
 
 // The next scheduled training day strictly after the given weekday.
 export function getNextWorkoutDay(fromDayIndex) {

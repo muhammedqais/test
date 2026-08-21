@@ -3,7 +3,7 @@
    at runtime (stale-while-revalidate), so the app keeps working offline
    after the first visit. Workout data lives in IndexedDB, not here. */
 
-const CACHE_NAME = 'myfitness-v1';
+const CACHE_NAME = 'myfitness-v2';
 
 const CORE_ASSETS = [
   './',
@@ -70,6 +70,46 @@ self.addEventListener('fetch', (event) => {
         })
         .catch(() => cached);
       return cached || network;
+    })
+  );
+});
+
+/* ---------- Daily workout reminders ---------- */
+/* Fired by Periodic Background Sync where the platform supports it
+   (installed Chrome/Android PWAs). The schedule mirrors the app's
+   built-in week; day index follows Date.getDay(). */
+
+const DAY_MESSAGES = {
+  0: 'Rest day — recover, meal prep, and get ready for next week.',
+  1: 'Upper Body A today. Time to train!',
+  2: 'Lower Body & Core A today. Time to train!',
+  3: 'Recovery day — full rest or a light walk.',
+  4: 'Recovery day — light stretching or mobility.',
+  5: 'Upper Body B today. Time to train!',
+  6: 'Lower Body & Core B today. Time to train!'
+};
+
+self.addEventListener('periodicsync', (event) => {
+  if (event.tag === 'daily-workout') {
+    event.waitUntil(
+      self.registration.showNotification('MYFITNESS', {
+        body: DAY_MESSAGES[new Date().getDay()],
+        icon: './icons/icon-192.png',
+        badge: './icons/icon-192.png',
+        tag: 'daily-workout'
+      })
+    );
+  }
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {
+      for (const client of clients) {
+        if ('focus' in client) return client.focus();
+      }
+      return self.clients.openWindow('./');
     })
   );
 });

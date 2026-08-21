@@ -25,12 +25,6 @@ export default function PreviousPerformance({ performance }) {
     <div>
       <div className="eyebrow">
         Previous session · {formatDayMonth(performance.date)}
-        {performance.sample && (
-          <>
-            {' '}
-            <span className="chip chip--sample">Sample</span>
-          </>
-        )}
       </div>
       <div className="prev-table">
         {performance.sets.map((set) => (

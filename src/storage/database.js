@@ -1,13 +1,15 @@
-// IndexedDB persistence layer. Two stores:
+// IndexedDB persistence layer. Three stores:
 //  - sessions: completed WorkoutSession records
 //  - active:   the single in-progress session draft (survives refresh/close)
+//  - meta:     settings and the user's exercise/workout customizations
 
 // Kept from the original branding: renaming an IndexedDB database would
 // orphan every workout already logged by existing installs.
 const DB_NAME = 'femurfit-db'
-const DB_VERSION = 1
+const DB_VERSION = 2
 const SESSIONS = 'sessions'
 const ACTIVE = 'active'
+const META = 'meta'
 const ACTIVE_KEY = 'current'
 
 let dbPromise = null
@@ -32,6 +34,9 @@ function openDatabase() {
       }
       if (!db.objectStoreNames.contains(ACTIVE)) {
         db.createObjectStore(ACTIVE, { keyPath: 'key' })
+      }
+      if (!db.objectStoreNames.contains(META)) {
+        db.createObjectStore(META, { keyPath: 'key' })
       }
     }
     request.onsuccess = () => resolve(request.result)
@@ -131,6 +136,8 @@ export async function getExerciseHistory(exerciseId) {
   return points.reverse()
 }
 
+// One-time cleanup: earlier versions shipped optional demo sessions
+// flagged `sample`. They are gone from the app, so purge any leftovers.
 export async function clearSampleSessions() {
   const sessions = await getAllSessions()
   const samples = sessions.filter((s) => s.sample)
@@ -138,6 +145,53 @@ export async function clearSampleSessions() {
     await deleteSession(s.id)
   }
   return samples.length
+}
+
+export async function getMeta(key) {
+  const db = await openDatabase()
+  const record = await tx(db, META, 'readonly', (store) => store.get(key))
+  return record ? record.value : null
+}
+
+export async function saveMeta(key, value) {
+  const db = await openDatabase()
+  return tx(db, META, 'readwrite', (store) => store.put({ key, value }))
+}
+
+// ---------- Backup & restore ----------
+
+export async function exportAllData() {
+  const [sessions, catalog, settings] = await Promise.all([
+    getAllSessions(),
+    getMeta('catalog'),
+    getMeta('settings')
+  ])
+  return {
+    app: 'myfitness',
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    sessions,
+    catalog,
+    settings
+  }
+}
+
+// Merges a backup into the current database: sessions are upserted by id
+// (nothing already logged is deleted), catalog/settings are replaced when
+// the backup carries them. Returns how many sessions were written.
+export async function importBackupData(payload) {
+  if (!payload || payload.app !== 'myfitness' || !Array.isArray(payload.sessions)) {
+    throw new Error('Not a valid MYFITNESS backup')
+  }
+  let count = 0
+  for (const session of payload.sessions) {
+    if (!session || typeof session.id !== 'string' || typeof session.date !== 'string') continue
+    await saveSession(session)
+    count++
+  }
+  if (payload.catalog) await saveMeta('catalog', payload.catalog)
+  if (payload.settings) await saveMeta('settings', payload.settings)
+  return count
 }
 
 export function makeId() {
